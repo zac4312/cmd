@@ -1,0 +1,73 @@
+#!/bin/bash
+
+echo "What would you like to do"
+echo
+echo "(1)Initialize New Spring Project"
+echo "(2)Add Directory into an existing Package"
+echo "(3)Add Files to project directories"
+echo "(4)Open project"
+echo "(5)Run project"
+echo "(6)Clean build"
+
+read choice
+
+if [ "$choice" == "1" ]; then
+  xdg-open https://start.spring.io
+
+elif [ "$choice" == "2" ]; then
+  echo "Please enter Project PATH"
+  read path
+
+  if [ -d "$path" ]; then
+    cd "$path"
+    while true; do
+      echo "Enter Directory name/To Stop enter: !!stop@: "
+      read dir
+      mkdir -p ./"$dir"
+
+      if [ "$dir" = "!!stop@" ]; then
+        break
+      fi
+    done
+  else
+    echo "Invalid path"
+  fi
+
+elif [ "$choice" == "3" ]; then
+  declare -a dir_list=()
+
+echo "Enter parent Directory Path"
+read ParentDir
+cd "$ParentDir"
+
+echo "Enter file name(!do not add file type)"
+    read filename
+
+while true; do
+    echo "Enter Directory(Controller, Service, etc)/type '!!exit@' to stop:"
+    read dir
+
+    if [ "$dir" == "!!exit@" ]; then
+        break
+    fi
+
+    dir_list+=("$dir")
+done
+ 
+for dir in "${dir_list[@]}"; do
+    file="${filename}${dir^}.java" 
+    touch "./$dir/$file"   
+    echo "Created: $dir/$filename"
+done
+
+elif [ "$choice" == "4" ]; then
+  openPRJ
+elif [ "$choice" == "5" ]; then
+  ./gradlew bootRun
+
+elif [ "$choice" == "6" ]; then
+  ./gradlew clean
+  ./gradlew build
+else
+  echo "Invalid choice"
+fi

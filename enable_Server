@@ -1,0 +1,5 @@
+#!/bin/bash
+
+sudo systemctl status nginx php8.3-fpm mysql
+
+

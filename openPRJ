@@ -1,0 +1,14 @@
+#!/bin/bash
+
+ls /home/zac/PROJECTS
+
+read -p "please enter the name(or full path) of the project you'd like to open: " prj           
+
+target="/home/zac/PROJECTS/$prj"
+
+if [ -d "$target" ]; then
+code "$target"
+else
+    echo "Error: Project '$prj' does not exist in /var/www/"
+    exit 1
+fi

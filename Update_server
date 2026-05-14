@@ -1,0 +1,16 @@
+#!/bin/bash
+
+
+sudo apt update
+sudo apt install --only-upgrade nginx
+
+sudo apt install --only-upgrade php8.3
+
+sudo apt install --only-upgrade mysql-server mysql-client
+
+sudo apt upgrade -y
+
+sudo systemctl restart nginx
+sudo systemctl restart php8.3
+sudo systemctl restart mysql-server mysql-client
+

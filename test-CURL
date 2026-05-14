@@ -1,0 +1,189 @@
+#!/bin/bash
+
+echo "which project are you testing?"
+echo "------------------------------------------------"
+ls ~/PROJECTS
+echo "------------------------------------------------"
+read prj
+
+cd "/home/zac/PROJECTS/$prj"
+
+read -p "would you like to open $prj? (y/n)" choice_code ##
+choice_code="${choice_code,,}"
+
+if [ "$choice_code" == "y" ]; then
+code .;
+fi
+####################################################
+while true; do
+  echo "SELECT ACTION: (enter !!stop@ to stop)"
+  echo "-----------------------------------------"
+  echo "COMPLETE CURL-TEST(0)"
+  echo "POST TEST(1)"
+  echo "GET-ALL TEST(2)"
+  echo "GET-BY-ID(3)"
+  echo "UPDATE(4)"
+  echo "DELETE-BY-ID(5)"
+  echo "DELETE ALL(6)"
+  read action
+
+  case "$action" in
+
+    0)  ## COMPLETE CURL-TEST
+        echo "Data format = {\"model1\": \"entry\", \"model2\": \"entry\" ......}"
+        echo "URL = http://localhost:8080/"
+
+        read -p "set application URL: " url
+        read -p "set id: " id
+        read -p "set application Header: Application/json(1) | Multipart/form-data(2): " header
+
+        case "$header" in
+          1) ## application/json
+             echo "ex: -d \"model\": \"entry\" \\ "
+             echo "add (-d) at the start and (\\) at the end of each entry"
+             read -p "set application Model-Data: " data
+             read -p "continue? (y/n): " continue
+             continue="${continue,,}"
+
+             if [ "$continue" == "y" ]; then
+               echo "TESTING...."
+               echo "----------------------------------"
+               echo "POST TEST"
+               curl --fail -X POST "$data" "$url/save"; postTest=$?
+               echo "----------------------------------"
+               echo "GET-ALL TEST"
+               curl --fail "$url/products"; getAllTest=$?
+               echo "----------------------------------"
+               echo "GET-ID TEST"
+               curl --fail "$url/$id"; getIDTest=$?
+               echo "----------------------------------"
+               echo "UPDATE TEST"
+               curl --fail -X POST "$data" "$url/$id"; updateTest=$?
+               echo "----------------------------------"
+               echo "DELETE-BY-ID TEST"
+               curl --fail -X DELETE "$url/$id"; dltIdTest=$?
+               echo "----------------------------------"
+               echo "DELETE-ALL TEST"
+               curl --fail -X DELETE "$url/dlt-all"; dltAllTest=$?
+               echo "----------------------------------"
+
+               echo "------------------------------------------"
+               echo "POST TEST:   $([ $postTest -eq 0 ] && echo PASSED || echo FAILED)"
+               echo "GET-ALL:     $([ $getAllTest -eq 0 ] && echo PASSED || echo FAILED)"
+               echo "GET-BY-ID:   $([ $getIDTest -eq 0 ] && echo PASSED || echo FAILED)"
+               echo "UPDATE:      $([ $updateTest -eq 0 ] && echo PASSED || echo FAILED)"
+               echo "DELETE-BY-ID:$([ $dltIdTest -eq 0 ] && echo PASSED || echo FAILED)"
+               echo "DELETE-ALL:  $([ $dltAllTest -eq 0 ] && echo PASSED || echo FAILED)"
+             fi
+             ;;
+          2) ## multipart
+             read -p "set application Model-Data (field1): " F1
+             read -p "set application Model-Data (field2): " F2
+             read -p "continue? (y/n): " continue
+             continue="${continue,,}"
+
+             if [ "$continue" == "y" ]; then
+               echo "TESTING...."
+               echo "----------------------------------"
+               echo "POST TEST"
+               curl --fail -X POST "$F1" "$F2" "$url/save"; postTest=$?
+               echo "----------------------------------"
+               echo "GET-ALL TEST"
+               curl --fail "$url/products"; getAllTest=$?
+               echo "----------------------------------"
+               echo "GET-ID TEST"
+               curl --fail "$url/$id"; getIDTest=$?
+               echo "----------------------------------"
+               echo "UPDATE TEST"
+               curl --fail -X POST "$F1" "$F2" "$url/$id"; updateTest=$?
+               echo "----------------------------------"
+               echo "DELETE-BY-ID TEST"
+               curl --fail -X DELETE "$url/$id"; dltIdTest=$?
+               echo "----------------------------------"
+               echo "DELETE-ALL TEST"
+               curl --fail -X DELETE "$url/dlt-all"; dltAllTest=$?
+               echo "----------------------------------"
+
+               echo "------------------------------------------"
+               echo "POST TEST:   $([ $postTest -eq 0 ] && echo PASSED || echo FAILED)"
+               echo "GET-ALL:     $([ $getAllTest -eq 0 ] && echo PASSED || echo FAILED)"
+               echo "GET-BY-ID:   $([ $getIDTest -eq 0 ] && echo PASSED || echo FAILED)"
+               echo "UPDATE:      $([ $updateTest -eq 0 ] && echo PASSED || echo FAILED)"
+               echo "DELETE-BY-ID:$([ $dltIdTest -eq 0 ] && echo PASSED || echo FAILED)"
+               echo "DELETE-ALL:  $([ $dltAllTest -eq 0 ] && echo PASSED || echo FAILED)"
+             fi
+             ;;
+          *) echo "INVALID OUTPUT";;
+        esac
+        ;;
+
+    1)  ## POST TEST
+        echo "POST TEST"
+        echo "Data format = {\"model1\": \"entry\", \"model2\": \"entry\" ......}"
+        read -p "set application URL: " url
+        read -p "set application Header: Application/json(1) | Multipart/form-data(2): " header
+        case "$header" in
+          1) read -p "set application Model-Data: " data
+             curl --fail -X POST -H "Content-type: application/json" -d "$data" "$url/save"; postTest=$?
+             echo "POST TEST: $([ $postTest -eq 0 ] && echo PASSED || echo FAILED)"
+             ;;
+          2) read -p "set application Model-Data (field1): " F1
+             read -p "set application Model-Data (field2): " F2
+             curl --fail -X POST "$F1" "$F2" "$url/save"; postTest=$?
+             echo "POST TEST: $([ $postTest -eq 0 ] && echo PASSED || echo FAILED)"
+             ;;
+        esac
+        ;;
+
+    2)  ## GET-ALL
+        echo "GET-ALL TEST"
+        read -p "enter URL: " url
+        curl -f "$url/products"
+        ;;
+
+    3)  ## GET-BY-ID
+        echo "GET-BY-ID TEST" 
+        read -p "enter base URL: " url
+        read -p "enter id: " id
+        curl -f "$url/products/$id"
+        ;;
+
+    4)  ## UPDATE
+        echo "UPDATE TEST"
+        read -p "set application URL: " url
+        read -p "set id: " id
+        read -p "set application Header: Application/json(1) | Multipart/form-data(2): " header
+        case "$header" in
+          1) read -p "set application Model-Data: " data
+             curl --fail -X POST -H "Content-type: application/json" -d "$data" "$url/$id"
+             ;;
+          2) read -p "set application Model-Data (field1): " F1
+             read -p "set application Model-Data (field2): " F2
+             curl --fail -X POST "$F1" "$F2" "$url/$id"
+             ;;
+        esac
+        ;;
+
+    5)  ## DELETE-BY-ID
+        echo "DELETE-BY-ID TEST"
+        read -p "set url: " url
+        read -p "set id: " id
+        curl -f -X DELETE "$url/dlt/$id"
+        ;;
+
+    6)  ## DELETE-ALL
+        echo "DELETE-ALL TEST"
+        read -p "set url: " url
+        curl -f -X DELETE "$url/dlt-all"
+        ;;
+
+    "!!stop@")
+        break
+        ;;
+
+    *)
+        echo "Invalid choice"
+        ;;
+  esac
+done
+

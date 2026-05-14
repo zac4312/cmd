@@ -1,0 +1,16 @@
+#!/bin/bash
+
+### Stop services
+sudo systemctl stop nginx
+sudo systemctl stop php8.3-fpm
+sudo systemctl stop mysql
+
+read -p "would you like to: Reboot(1) or Shutdown(2)? " confirmation
+if [ "$confirmation" == "2" ]; then
+    sudo poweroff
+elif [ "$confirmation" == "1" ]; then
+    sudo reboot
+else
+    echo "Shutdown aborted."
+fi
+
